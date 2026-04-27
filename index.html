@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AgroGuide 🌱</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🌾 AgroGuide</h1>
+        <p>Smart Crop Suggestion</p>
+
+        <p style="font-size:14px; color:gray;">
+            Helping farmers make smarter decisions 🌱
+        </p>
+
+        <input type="text" id="location" placeholder="Enter your city">
+
+        <select id="soil">
+            <option value="">Select Soil Type</option>
+            <option value="clay">Clay</option>
+            <option value="sandy">Sandy</option>
+            <option value="loamy">Loamy</option>
+        </select>
+        <select id="weather">
+            <option value="">Select Weather</option>
+            <option value="hot">Hot</option>
+            <option value="rainy">Rainy</option>
+            <option value="cold">Cold</option>
+        </select>
+
+        <button onclick="getLocation()">Use My Location</button>
+
+        <button onclick="suggestCrop()">Suggest Crop</button>
+
+        <div id="result" class="result-card"></div>
+    </div>
+
+    
+
+    <script src="script.js"></script>
+</body>
+</html>

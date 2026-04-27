@@ -1,0 +1,77 @@
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #a8e063, #56ab2f);
+    text-align: center;
+    padding: 50px;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 300px;
+    margin: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+input, select {
+    width: 90%;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #56ab2f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #3d8b1e;
+}
+
+h2 {
+    color: #333;
+}
+#result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f4f4f4;
+    border-radius: 10px;
+}
+.result-card {
+    margin-top: 20px;
+    padding: 20px;
+    background: #e8f5e9;
+    border-left: 5px solid #2e7d32;
+    border-radius: 10px;
+    text-align: left;
+}
+button {
+    background: linear-gradient(to right, #56ab2f, #a8e063);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+input, select {
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border: 1px solid #56ab2f;
+    outline: none;
+}

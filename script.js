@@ -1,67 +1,85 @@
-function suggestCrop() {
+async function suggestCrop() {
+    console.log("Button clicked");
 
-    let location = document.getElementById("location").value.toLowerCase().trim();
+    let location = document.getElementById("location").value.trim();
     let soil = document.getElementById("soil").value;
     let weather = document.getElementById("weather").value;
 
     let resultBox = document.getElementById("result");
 
-    // 🔄 Loading effect
     resultBox.innerHTML = "⏳ Analyzing conditions...";
 
-    // ⛔ Validation
     if (!soil || !weather) {
-        resultBox.innerHTML = "⚠ Please select soil type and weather";
+        resultBox.innerHTML = "⚠ Please select soil and weather";
         return;
     }
 
     let crop = "";
     let tip = "";
     let risk = "";
+    let tempText = "Not available";
 
-    // 🌾 Smart Logic
-    if (soil === "clay" && weather === "rainy") {
-        crop = "Rice";
-        tip = "Clay soil retains water well";
-        risk = "Avoid over-irrigation";
-    } 
-    else if (soil === "loamy" && weather === "cold") {
-        crop = "Wheat";
-        tip = "Loamy soil is nutrient-rich";
-        risk = "Protect from frost";
-    } 
-    else if (soil === "sandy" && weather === "hot") {
-        crop = "Maize";
-        tip = "Good drainage in sandy soil";
-        risk = "Water frequently";
-    } 
-    else {
-        crop = "Mixed Crops";
-        tip = "Balanced farming recommended";
-        risk = "Monitor soil moisture regularly";
+    // 🌦 Weather API
+    try {
+        let apiKey = "33599ef4b104531f6a122239dc07a835";
+        let url = `https://api.openweathermap.org/data/2.5/weather?q=${location},IN&appid=${apiKey}&units=metric`;
+
+        let response = await fetch(url);
+        let data = await response.json();
+
+        console.log(data);
+
+        if (data.cod === 200 && data.main) {
+            tempText = data.main.temp + "°C";
+        }
+
+    } catch (error) {
+        console.log("Weather API error:", error);
     }
 
-    // 🌍 Location-based extra tip
-    if (location.includes("bihar")) {
-        tip += " | Suitable for eastern region";
-    } else if (location.includes("punjab")) {
-        tip += " | Suitable for northern region";
+    // 🌾 Backend API
+    try {
+        let response = await fetch(
+            `http://localhost:8080/suggest?soil=${soil}&weather=${weather}`
+        );
+
+        let data = await response.json();
+
+        crop = data.crop;
+        tip = data.tip;
+
+    } catch (error) {
+        resultBox.innerHTML = "⚠ Backend not working";
+        console.log("Backend error:", error);
+        return;
     }
 
-    // 🎯 Final Output
+    // 🎯 Output
     resultBox.innerHTML = `
-        🌾 <b>Recommended Crop:</b> ${crop} <br><br>
-        💡 <b>Tip:</b> ${tip} <br><br>
-        ⚠ <b>Risk:</b> ${risk}
+        🌾 <b>Crop:</b> ${crop} <br><br>
+        🌡 <b>Temperature:</b> ${tempText} <br><br>
+        💡 <b>Tip:</b> ${tip}
     `;
 }
-
-
-// 📍 Auto Location Button (Demo purpose)
 function getLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById("location").value = "Auto Detected";
+        navigator.geolocation.getCurrentPosition(async function(position) {
+
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+
+            console.log(lat, lon);
+
+            let apiKey = "33599ef4b104531f6a122239dc07a835";
+            let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+            let response = await fetch(url);
+            let data = await response.json();
+
+            if (data.name) {
+                document.getElementById("location").value = data.name;
+            }
+
         });
     } else {
         alert("Geolocation not supported");

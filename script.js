@@ -1,4 +1,5 @@
 async function suggestCrop() {
+
     console.log("Button clicked");
 
     let location = document.getElementById("location").value.trim();
@@ -7,81 +8,75 @@ async function suggestCrop() {
 
     let resultBox = document.getElementById("result");
 
-    resultBox.innerHTML = "⏳ Analyzing conditions...";
+    resultBox.innerHTML = "⏳ Loading...";
 
-    if (!soil || !weather) {
-        resultBox.innerHTML = "⚠ Please select soil and weather";
+    // validation
+    if (!location || !soil || !weather) {
+        resultBox.innerHTML = "⚠ Please fill all fields";
         return;
     }
 
-    let crop = "";
-    let tip = "";
-    let risk = "";
-    let tempText = "Not available";
-
-    // 🌦 Weather API
     try {
-        let apiKey = "33599ef4b104531f6a122239dc07a835";
-        let url = `https://api.openweathermap.org/data/2.5/weather?q=${location},IN&appid=${apiKey}&units=metric`;
-
-        let response = await fetch(url);
-        let data = await response.json();
-
-        console.log(data);
-
-        if (data.cod === 200 && data.main) {
-            tempText = data.main.temp + "°C";
-        }
-
-    } catch (error) {
-        console.log("Weather API error:", error);
-    }
-
-    // 🌾 Backend API
-    try {
+        // 🔥 Backend call (new)
         let response = await fetch(
-            `http://localhost:8080/suggest?soil=${soil}&weather=${weather}`
+          `http://localhost:8080/suggest?location=${location}&soil=${soil}&weather=${weather}`
         );
 
         let data = await response.json();
 
-        crop = data.crop;
-        tip = data.tip;
+        // 🎯 Output
+        resultBox.innerHTML = `
+            🌾 <b>Crop:</b> ${data.crop} <br><br>
+            🌡 <b>Temperature:</b> ${data.temperature} °C <br><br>
+            💡 <b>Tip:</b> ${data.tip}
+        `;
+        console.log(data);
+        console.log(resultBox);
+        
 
     } catch (error) {
         resultBox.innerHTML = "⚠ Backend not working";
-        console.log("Backend error:", error);
+        console.log(error);
+    }
+}
+function getLocation() {
+
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported");
         return;
     }
 
-    // 🎯 Output
-    resultBox.innerHTML = `
-        🌾 <b>Crop:</b> ${crop} <br><br>
-        🌡 <b>Temperature:</b> ${tempText} <br><br>
-        💡 <b>Tip:</b> ${tip}
-    `;
-}
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async function(position) {
+    navigator.geolocation.getCurrentPosition(
+        async function(position) {
 
             let lat = position.coords.latitude;
             let lon = position.coords.longitude;
 
-            console.log(lat, lon);
+            console.log("Lat:", lat, "Lon:", lon);
 
-            let apiKey = "33599ef4b104531f6a122239dc07a835";
-            let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+            try {
+                // 🔥 Reverse geocoding (convert lat/lon → city)
+                let response = await fetch(
+                    `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=0f5968d750a6a5fee45c82d4bb1d1212`
+                );
 
-            let response = await fetch(url);
-            let data = await response.json();
+                let data = await response.json();
 
-            if (data.name) {
-                document.getElementById("location").value = data.name;
+                if (data && data.length > 0) {
+                    let city = data[0].name;
+                    document.getElementById("location").value = city;
+                } else {
+                    alert("City not found");
+                }
+
+            } catch (error) {
+                console.log(error);
+                alert("Error fetching location");
             }
 
-        });
-    } else {
-        alert("Geolocation not supported");
-    }
+        },
+        function(error) {
+            alert("Location permission denied");
+        }
+    );
 }

@@ -4,10 +4,12 @@ public class CropResponse {
 
     private String crop;
     private String tip;
+    private double temperature;
 
-    public CropResponse(String crop, String tip) {
+    public CropResponse(String crop, String tip, double temperature) {
         this.crop = crop;
         this.tip = tip;
+        this.temperature = temperature;
     }
 
     public String getCrop() {
@@ -16,5 +18,8 @@ public class CropResponse {
 
     public String getTip() {
         return tip;
+    }
+    public double getTemperature(){
+        return temperature;
     }
 }

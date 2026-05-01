@@ -46,37 +46,21 @@ function getLocation() {
         return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-        async function(position) {
+    navigator.geolocation.getCurrentPosition(function(position) {
 
-            let lat = position.coords.latitude;
-            let lon = position.coords.longitude;
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
 
-            console.log("Lat:", lat, "Lon:", lon);
+        console.log("Lat:", lat, "Lon:", lon);
 
-            try {
-                // 🔥 Reverse geocoding (convert lat/lon → city)
-                let response = await fetch(
-                    `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=0f5968d750a6a5fee45c82d4bb1d1212`
-                );
+        // backend ko send karo
+        fetch(`http://localhost:8080/location?lat=${lat}&lon=${lon}`)
+            .then(res => res.text())
+            .then(city => {
+                console.log("city: ",city);
+                document.getElementById("location").value = city;
+            })
+            .catch(err => console.log(err));
 
-                let data = await response.json();
-
-                if (data && data.length > 0) {
-                    let city = data[0].name;
-                    document.getElementById("location").value = city;
-                } else {
-                    alert("City not found");
-                }
-
-            } catch (error) {
-                console.log(error);
-                alert("Error fetching location");
-            }
-
-        },
-        function(error) {
-            alert("Location permission denied");
-        }
-    );
+    });
 }

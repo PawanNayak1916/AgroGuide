@@ -73,6 +73,7 @@ button:hover {
     transform: scale(1.05);
 }
 
+
 input, select {
     transition: 0.3s;
 }

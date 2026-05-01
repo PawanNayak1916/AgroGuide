@@ -1,15 +1,18 @@
 package com.pawan.agroGuide.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import com.pawan.agroGuide.model.CropResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
 public class CropController {
 
-    private final String API_KEY = "0f5968d750a6a5fee45c82d4bb1d1212";
+    @Value("${weather.api.key}")
+    private String apiKey;
 
     @GetMapping("/suggest")
     public CropResponse suggestCrop(
@@ -21,7 +24,7 @@ public class CropController {
 
         try {
             String url = "https://api.openweathermap.org/data/2.5/weather?q="
-                    + location + ",IN&appid=" + API_KEY + "&units=metric";
+                    + location + ",IN&appid=" + apiKey + "&units=metric";
             RestTemplate restTemplate = new RestTemplate();
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
@@ -61,5 +64,31 @@ public class CropController {
         }
 
         return new CropResponse(crop, tip, temp);
+    }
+    @GetMapping("/location")
+    public String getCity(@RequestParam double lat, @RequestParam double lon) {
+
+        try {
+            String url = "https://api.openweathermap.org/geo/1.0/reverse?lat="
+                    + lat + "&lon=" + lon + "&limit=1&appid=" + apiKey;
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            List<Map<String, Object>> response =
+                    restTemplate.getForObject(url, List.class);
+
+            if (response != null && !response.isEmpty()) {
+
+                Map<String, Object> locationData = response.get(0);
+
+                // 🔥 correct field
+                return locationData.get("name").toString();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "Unknown";
     }
 }
